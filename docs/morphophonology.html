@@ -7,10 +7,19 @@
     body {
       font-family: "Junicode";
     }
+    .opts {
+      display: inline-block;
+    }
   </style>
+  <script src="index.js"></script>
 </head>
 <body>
   <p>This is an analysis of the morphophonology of Latin verbs. Based on research by Morris Halle, David Embick, and Andrea Calabrese, including <a href="https://www.mitpressjournals.org/doi/pdf/10.1162/ling_a_00313">“Aspects of the Morphophonology of the Verb in Latin and in German and English”</a> and other unpublished results.</p>
+
+  <h2>Interactive Widget</h2>
+  <div id="interactive"></div>
+
+
   <h2>Introduction</h2>
   <p>Latin has the usual five vowels /a e i o u/, with phonemic length contrasts for each, typically indicated with macrons /ā ē ī ō ū/. Latin also has three diphthongs /ae oe ui/, but those are not relevant here. Following Halle’s analysis, we posit an underlying sixth vowel /ɨ/ that is deleted in some contexts (namely, before vowels) and otherwise pronounced as /i/.</p>
   <p>What follows is a breakdown of each vowel sound into its features. Each vowel can, of course, be long [+long] or short [-long]; this is not represented in the table below. The two back vowels /o u/ are round, so the feature [±round] is left out in this analysis. The two vowels /a ɨ/ are considered central: that is, neither front nor back, and they group together this way for the purposes of prevocalic deletion.</p>
@@ -126,6 +135,9 @@
       <td>fer‑re</td>
     </tr>
   </table>
+
+
+
   <h2>Analysis</h2>
   <table>
     <thead>Verbal Structure</thead>
@@ -146,45 +158,55 @@
       <td>The (non-semantic) agreement of the verb with its subject, for finite tense.</td>
     </tr>
   </table>
-  <p>Spell-out rules:</p>
+  <h4>Spell-out rules:</h4>
+  <p>The morpheme ASP[perf] has various realizations, depending on the root it is attached to. The most common realization (almost universally for the first conjugation, occasionally in the second, and frequently for the fourth conjugation) is as /v/ after a theme vowel. Some verbs, however, lose their theme vowel in the perfect, and a number of cases occur. Standard phonetic behavior dictates that /v/ becomes /u/ in that context. (In Roman times, the distinction was not even notated, v and u were written the same, although the phonetic distinction was known.) However, with verbs that become athematic in the perfect, other allomorphs of ASP[perf] occur, including /s/ and /∅/, where alteration of the root sometimes occurs with the null allomorph, usually vowel lengthening/ablaut in the stem or reduplication.</p>
+  <p>When a verb is athematic, following Calabrese, this analysis states that the v node is deleted, which allows the ASP[perf] to influence the root, since they become adjacent. This analysis also says that T[pres] is deleted, whenever it occurs; it is used to mark finite tense but disappears phonetically.</p>
+  <p>There are several patterns in the other morphemes. Most of the morphemes start out as /s/ plus a theme vowel, but in most cases it is rhotacized to become /r/, with the notable exception of the pluperfect subjunctive, where T[past]M[subj] is realized as /s+∅-s+ē/. More specifically, both T[past] and T[fut] are realized with /s/ (plus a vowel) after AST[perf]. Otherwise, they are realized with a /b/ (plus a vowel). In both cases, T[past] has theme vowel /ā/ and T[fut] has theme vowel /ɨ/. However, there is one exception: after the high theme vowels of conjugations III, III(i), and IV, T[past] gains /ē/ and T[fut] is realized as just /ē/.</p>
   <ol>
-    <li> ASP[perf] ⟶ /v/ (/u/), /s/, /∅/ + /ɨ/
-      <p>Note: selected by verb root via vocabulary insertion.</p>
+    <li> ASP[perf] ⟶ /v+ɨ/ (/u+ɨ/), /s+ɨ/, or /∅+ɨ/
+      <p>Note: allomorph is selected by verb root via vocabulary insertion.</p>
     <li> T[pres] ⟶ /∅/ (T node deleted)
-    <li> T[past] ⟶ /s/+/∅/ in env. ASP[perf]__M[subj]
-      <p>Note: NOT rhotacised.</p>
+    <li> T[past] ⟶ /s+∅/ in env. ASP[perf]__M[subj]
+      <p>Note: NOT rhotacised, since it is immediately followed /s/ + /ē/ realizing M[subj].</p>
     <li> T[past] ⟶ /∅/ in env. __M[subj]
-      <p>Note: not sure if this is null, or if M[subj] is null.</p>
-    <li> T[past] ⟶ /s/+/ā/ in env. ASP[perf]__
+      <p>Note: not sure if this is null, or if M[subj] is null, or maybe T[past] is /s+∅/ and M[subj] is /∅+ē/.</p>
+    <li> T[past] ⟶ /s+ā/ in env. ASP[perf]__
       <p>Note: rhotacised.</p>
-    <li> T[past] ⟶ /ēb/+/ā/ in env. v+TH[+front]__
-    <li> T[past] ⟶ /b/+/ā/ in env. v+TH[-front]__
-    <li> T[fut] ⟶ /s/+/ɨ/ in env. ASP[perf]__
+    <li> T[past] ⟶ /ēb+ā/ in env. v+TH[+high]__
+    <li> T[past] ⟶ /b+ā/ in env. v+TH[-high]__
+    <li> T[fut] ⟶ /s+ɨ/ in env. ASP[perf]__
       <p>Note: rhotacised.</p>
-    <li> T[fut] ⟶ /∅/+/ē/ in env. v+TH[+front]__
-    <li> T[fut] ⟶ /b/+/ɨ/ in env. v+TH[-front]__
-    <li> M[subj] ⟶ /s/ + /ē/ in env. T[past]__
-      <p>Note: rhotacised in perfect tense, not pluperfect.</p>
+    <li> T[fut] ⟶ /∅+ē/ in env. v+TH[+high]__
+    <li> T[fut] ⟶ /b+ɨ/ in env. v+TH[-high]__
+    <li> M[subj] ⟶ /s+ē/ in env. T[past]__
+      <p>Note: rhotacised in imperfect tense, not pluperfect.</p>
     <li> M[subj] ⟶ /s/ + /ī/ in env. ASP[perf]__
       <p>Note: rhotacised.</p>
   </ol>
-  <p>Rules:</p>
+  <h4>Phonetic rules:</h4>
   <ol>
     <li> Central-vowel deletion: Delete [-back, -front] in env. __V
       <p>This deletes /a/ and /ɨ/ for conjugations I and III.</p>
-    <li> Rhotastic lowering: /ĭs/ ⟶ /ĕr/ in env. __V
-      <p>This is rhotacism followed by lowering, in one rule. Lowering is properly /ĭ/ ⟶ /ĕ/ in env. __ rhotacised /s/, but a combined rule makes for a simpler encoding here.</p>
-      <p>Note: note implemented yet.</p>
     <li> Rhotacism: /s/ ⟶ /r/ in env. V__V
       <p>This is a common sound change in the development of Latin phonology, and occurs in many contexts (c.f. <a href="https://en.wiktionary.org/wiki/mos#Latin">mōs, mōris</a>). Notably for our analysis it allows us to posit that the infinitive /es-se/ is actually a regular form, being athematic.</p>
+    <li> Lowering: /ĭ/ ⟶ /ĕ/ in env. __ rhotacised /s/
+      <p>Note: this is currently applied indescriminately every time before /r/.</p>
     <li> Shortening: V̄ ⟶ V̆ in env. __V
       <p>This takes care of vowel shortening for Conjugations I, II, and IV in various contexts, such as before /‑ō/ in the first-person forms.</p>
     <li> Shortening2: V̄ ⟶ V̆ in env. σ(__C[-strident])
       <p>This applies to vowels in a syllable with a nonstrident consonant in the coda. This takes care of vowel shortening for Conjugations I, II, and IV in the remaining contexts, such as in the third-person forms before /‑t/ and /‑nt/ and /‑n‑tur/ (but importantly not before the third-person passive /‑tur/, which starts a new syllable and still has a long vowel preceding it).</p>
-      <p>Note: not implemented yet.</p>
+      <p>Note: this was implemented in a hacky way, in lieu of implementing consonant features and proper syllabification. In particular, the relevant agreement endings were equipped with a “shortening consonant” "˘" that shortened the preceding vowel and was deleted later.</p>
     <li> High-vowel Fronting: [-front] ⟶ [+front] in env. [-back, +high]
       <p>Finally, as the last sound change, any remaining /ɨ/ are pronounced as /i/.</p>
   </ol>
   <p>(Discussion of rule ordering.)</p>
+
+
+  <h2>Limitations and Open Questions</h2>
+  <ul>
+    <li>The current analysis does not account for the present subjunctive, which is realized by modifying the stem vowel (modified to /ē/ for conjugation I, appending /ā/ for the other conjugations).
+    <li>The current analysis does not account for the first-person future being like <a href="https://en.wiktionary.org/wiki/ducam#Latin">dūcam</a> instead of *dūceō.
+    <li>The program currently does not implement the perfect stem correctly.
+  </ul>
 </body>
 </html>

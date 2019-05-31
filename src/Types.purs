@@ -206,6 +206,18 @@ data Agreement = Agreement Person Numerus
 derive instance eqAgreement :: Eq Agreement
 derive instance ordAgreement :: Ord Agreement
 
+getPerson :: Agreement -> Person
+getPerson (Agreement p _) = p
+
+getNumber :: Agreement -> Numerus
+getNumber (Agreement _ n) = n
+
+setPerson :: Agreement -> Person -> Agreement
+setPerson (Agreement _ n) p = Agreement p n
+
+setNumber :: Agreement -> Numerus -> Agreement
+setNumber (Agreement p _) n = Agreement p n
+
 data Morphophoneme
   = MorphPh Phoneme
   | MorphT Tense
