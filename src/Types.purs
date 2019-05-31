@@ -7,14 +7,13 @@ import Data.Array as Array
 import Data.Foldable (class Foldable, foldMap, oneOfMap)
 import Data.FoldableWithIndex (allWithIndex)
 import Data.Map (Map)
-import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Newtype (class Newtype, unwrap)
 import Data.Profunctor (dimap)
 import Data.Set (Set)
 import Data.Set as Set
 import Data.String as String
-import Data.Tuple (Tuple(..))
+import Data.Tuple (Tuple)
 
 -- Features used to describe vowels
 data VowelFeature
@@ -192,13 +191,17 @@ data Mood
 derive instance eqMood :: Eq Mood
 derive instance ordMood :: Ord Mood
 
--- Features for AGR
-data Agreement
-  = AGRFirst
-  | AGRSecond
-  | AGRThird
-  | AGRSingular
-  | AGRPlural
+data Person = P1 | P2 | P3
+
+derive instance eqPerson :: Eq Person
+derive instance ordPerson :: Ord Person
+
+data Numerus = Singular | Plural
+
+derive instance eqNumerus :: Eq Numerus
+derive instance ordNumerus :: Ord Numerus
+
+data Agreement = Agreement Person Numerus
 
 derive instance eqAgreement :: Eq Agreement
 derive instance ordAgreement :: Ord Agreement
@@ -209,6 +212,9 @@ data Morphophoneme
   | MorphASP Aspect
   | MorphM Mood
   | MorphAGR Agreement
+
+derive instance eqMorphophoneme :: Eq Morphophoneme
+derive instance ordMorphophoneme :: Ord Morphophoneme
 
 data Conjugation
   = CI
@@ -232,19 +238,49 @@ type Themed a =
     Maybe { feat :: a, head :: String, theme :: Array Vowel }
 
 renderThemed :: forall a. Themed a -> String
-renderThemed = foldMap \{ head, theme } -> head <> foldMap renderVowel theme
+renderThemed = foldMap renderThemed'
+
+renderThemed_ :: forall a. Themed a -> String
+renderThemed_ = maybe ""
+  \t ->
+    let
+      sepIf _ "" = ""
+      sepIf sep s = sep <> s
+    in sepIf "-" t.head <> sepIf "+" (foldMap renderVowel t.theme)
+
+renderThemed' :: forall a. { feat :: a, head :: String, theme :: Array Vowel } -> String
+renderThemed' t = t.head <> foldMap renderVowel t.theme
+
+type VerbSpec =
+  { root :: String
+  , verb :: Maybe Conjugation
+  , aspect :: Maybe Aspect
+  , tense :: Maybe Tense
+  , mood :: Maybe Mood
+  , agreement :: Maybe Agreement
+  }
 
 type Featured a = a
 type Erased a = Unit
 type Handled = Tuple Boolean
 type VerbStructure f =
   { root :: String
-  , verb :: Themed (f (Maybe Conjugation))
-  , aspect :: Themed (f (Maybe Aspect))
-  , tense :: Themed (f (Maybe Tense))
-  , mood :: Themed (f (Maybe Mood))
-  , agreement :: Maybe { feat :: f (Set Agreement), suffix :: String }
+  , verb :: Themed (f Conjugation)
+  , aspect :: Themed (f Aspect)
+  , tense :: Themed (f Tense)
+  , mood :: Themed (f Mood)
+  , agreement :: Maybe { feat :: f Agreement, suffix :: String }
   }
+
+renderVerbStructure :: forall f. VerbStructure f -> String
+renderVerbStructure vs = vs.root
+  <> renderThemed_ vs.verb
+  <> renderThemed_ vs.aspect
+  <> renderThemed_ vs.tense
+  <> renderThemed_ vs.mood
+  <> case vs.agreement of
+    Nothing -> ""
+    Just { suffix } -> "-" <> suffix
 
 type Focus a = a
 type Focused f a =
