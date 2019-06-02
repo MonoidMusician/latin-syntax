@@ -282,13 +282,14 @@ type Themed a =
 renderThemed :: forall a. Themed a -> String
 renderThemed = foldMap renderThemed'
 
+
+sepIf :: String -> String -> String
+sepIf _ "" = ""
+sepIf sep s = sep <> s
+
 renderThemed_ :: forall a. Themed a -> String
 renderThemed_ = maybe ""
-  \t ->
-    let
-      sepIf _ "" = ""
-      sepIf sep s = sep <> s
-    in sepIf "-" t.head <> sepIf "+" (foldMap renderVowel t.theme)
+  \t -> sepIf "-" t.head <> sepIf "+" (foldMap renderVowel t.theme)
 
 renderThemed' :: forall a. { feat :: a, head :: String, theme :: Array Vowel } -> String
 renderThemed' t = t.head <> foldMap renderVowel t.theme
@@ -323,6 +324,16 @@ renderVerbStructure vs = vs.root
   <> case vs.agreement of
     Nothing -> ""
     Just { suffix } -> "-" <> suffix
+
+renderVerb :: forall f. VerbStructure f -> String
+renderVerb vs = vs.root
+  <> renderThemed vs.verb
+  <> renderThemed vs.aspect
+  <> renderThemed vs.tense
+  <> renderThemed vs.mood
+  <> case vs.agreement of
+    Nothing -> ""
+    Just { suffix } -> suffix
 
 type Focus a = a
 type Focused f a =

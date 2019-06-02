@@ -1,13 +1,14 @@
 module Latin.Main where
 
 import Prelude
-import Latin.Types (Agreement(..), Aspect(..), Conjugation(..), Mood(..), Numerus(..), Person(..), Tense(..), VerbSpec, VerbStructure, Vowel, getNumber, getPerson, renderVerbStructure, renderVowel, setNumber, setPerson)
-import Latin.Data (initVS, phRule, run, spellout)
+import Latin.Types (Agreement(..), Aspect(..), Conjugation(..), Mood(..), Numerus(..), Person(..), Tense(..), VerbSpec, VerbStructure, Vowel, getNumber, getPerson, renderVerbStructure, renderVerb, renderVowel, setNumber, setPerson, runRuleVerbStructure, sepIf)
+import Latin.Data (initVS, phRules', run, spellouts')
 
 import Partial.Unsafe (unsafePartial)
 import Data.Const (Const)
 import Data.Maybe (Maybe(..), maybe)
-import Data.Foldable (class Foldable, foldMap)
+import Data.Tuple (Tuple(..))
+import Data.Foldable (class Foldable, foldMap, foldl)
 import Control.Plus (empty, (<|>))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
@@ -110,8 +111,18 @@ component = H.mkComponent
             [ HE.onClick \_ -> Just (SetSpec new) ]
             [ HH.text $ (run new).final ]
 
-        spelled = spellout (initVS (spec))
-        pronounced = phRule (spelled)
+        spell (Tuple spelling spelled) (Tuple name rule) =
+          let
+            new = rule spelled
+          in if spelled == new then Tuple spelling spelled
+            else Tuple (spelling <|> [Tuple name new]) new
+        Tuple spelling spelled = foldl spell (Tuple empty (initVS spec)) spellouts'
+        pronounce (Tuple pronouncing pronounced) (Tuple name rule) =
+          let
+            new = runRuleVerbStructure rule pronounced
+          in if pronounced == new then Tuple pronouncing pronounced
+            else Tuple (pronouncing <|> [Tuple name new]) new
+        Tuple pronouncing pronounced = foldl pronounce (Tuple empty spelled) phRules'
       in HH.div_
         [ HH.div_
           [ HH.text "Examples: "
@@ -156,9 +167,33 @@ component = H.mkComponent
           [ { name: "Singular", val: Just Singular, dis: false }
           , { name: "Plural", val: Just Plural, dis: false }
           ]
-        , HH.p_ [ HH.text "After spellout of morphemes:" ]
+        , HH.p_
+          [ HH.b_ [ HH.text "Derivation: " ]
+          , HH.text $ spec.root
+              <> sepIf "-" (foldMap show spec.verb)
+              <> sepIf "-" (foldMap show spec.aspect)
+              <> sepIf "-" (foldMap show spec.tense)
+              <> sepIf "-" (foldMap show spec.mood)
+              <> sepIf "-" (foldMap show spec.agreement)
+          , HH.text " ⟶ "
+          , HH.text $ renderVerbStructure spelled
+          , HH.text " ⟶ "
+          , HH.text $ renderVerbStructure pronounced
+          , HH.text " ("
+          , HH.b_ [ HH.text $ renderVerb pronounced ]
+          , HH.text ")"
+          ]
+        , HH.div_ $ spelling >>= \(Tuple rule new) ->
+          [ HH.p_ [ HH.text rule ]
+          , hrenderVS new
+          ]
+        , HH.p_ [ HH.b_ [ HH.text "After spellout of morphemes:" ] ]
         , hrenderVS spelled
-        , HH.p_ [ HH.text "After phonological changes:" ]
+        , HH.div_ $ pronouncing >>= \(Tuple rule new) ->
+          [ HH.p_ [ HH.text rule ]
+          , hrenderVS new
+          ]
+        , HH.p_ [ HH.b_ [ HH.text "After phonological changes:" ] ]
         , hrenderVS pronounced
         ]
     eval :: H.HalogenQ (Const Void) Action Unit ~> H.HalogenM State Action () Void Aff

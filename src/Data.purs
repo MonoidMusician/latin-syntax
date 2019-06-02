@@ -143,8 +143,12 @@ soEnv' match rule vs a =
   if match vs then rule vs a else Nothing
 
 spellouts :: Array SORule
-spellouts =
-  [ spellfeat _verb \_ conj ->
+spellouts = spellouts' <#> extract
+
+spellouts' :: Array (Tuple String SORule)
+spellouts' =
+  [ Tuple "Conjugation theme vowel" $
+    spellfeat _verb \_ conj ->
       Just $ Just
         { feat: unit
         , head: ""
@@ -155,22 +159,22 @@ spellouts =
             CIIIi -> Vowel Vi false
             CIV -> Vowel Vi true
         }
-  -- 1. ASP[perf] ⟶ /v+ɨ/ (/u+ɨ/), /s+ɨ/, or /∅+ɨ/
   -- Note: allomorphemes are not modeled.
-  , spellfeat _aspect \_ -> case _ of
+  , Tuple "1. ASP[perf] ⟶ /v+ɨ/ (/u+ɨ/), /s+ɨ/, or /∅+ɨ/" $
+    spellfeat _aspect \_ -> case _ of
       ASPPerf -> Just $ Just
         { feat: unit
         , head: "v"
         , theme: pure $ Vowel V_i false
         }
-  -- 2. T[pres] ⟶ /∅/ (T node deleted)
-  , spellfeat _tense \_ -> case _ of
+  , Tuple "2. T[pres] ⟶ /∅/ (T node deleted)" $
+    spellfeat _tense \_ -> case _ of
       -- Delete T[pres] node
       TPres -> Just Nothing
       -- Do nothing
       _ -> Nothing
-  -- 3. T[past] ⟶ /s+∅/ in env. ASP[perf]__M[subj]
-  , soEnv (matchField _aspect isPerf) $
+  , Tuple "3. T[past] ⟶ /s+∅/ in env. ASP[perf]__M[subj]" $
+    soEnv (matchField _aspect isPerf) $
     soEnv (matchField _mood   isSubj) $
     spellfeat _tense \_ -> case _ of
       TPast -> Just $ Just
@@ -179,8 +183,8 @@ spellouts =
         , theme: empty
         }
       _ -> Nothing
-  -- 4. T[past] ⟶ /∅/ in env. __M[subj]
-  , soEnv (matchField _mood   isSubj) $
+  , Tuple "4. T[past] ⟶ /∅/ in env. __M[subj]" $
+    soEnv (matchField _mood   isSubj) $
     spellfeat _tense \_ -> case _ of
       TPast -> Just $ Just
         { feat: unit
@@ -188,8 +192,8 @@ spellouts =
         , theme: empty
         }
       _ -> Nothing
-  -- 5. T[past] ⟶ /s+ā/ in env. ASP[perf]__
-  , soEnv (matchField _aspect isPerf) $
+  , Tuple "5. T[past] ⟶ /s+ā/ in env. ASP[perf]__" $
+    soEnv (matchField _aspect isPerf) $
     spellfeat _tense \_ -> case _ of
       TPast -> Just $ Just
         { feat: unit
@@ -197,8 +201,8 @@ spellouts =
         , theme: pure $ Vowel Va true
         }
       _ -> Nothing
-  -- 6. T[past] ⟶ /ēb+ā/ in env. v+TH[+high]__
-  , soEnv (matchField _verb isHigh) $
+  , Tuple "6. T[past] ⟶ /ēb+ā/ in env. v+TH[+high]__" $
+    soEnv (matchField _verb isHigh) $
     spellfeat _tense \_ -> case _ of
       TPast -> Just $ Just
         { feat: unit
@@ -206,8 +210,8 @@ spellouts =
         , theme: pure $ Vowel Va true
         }
       _ -> Nothing
-  -- 7. T[past] ⟶ /b+ā/ in env. v+TH[-high]__
-  , soEnv (matchField _verb (not isHigh)) $
+  , Tuple "7. T[past] ⟶ /b+ā/ in env. v+TH[-high]__" $
+    soEnv (matchField _verb (not isHigh)) $
     spellfeat _tense \_ -> case _ of
       TPast -> Just $ Just
         { feat: unit
@@ -215,8 +219,8 @@ spellouts =
         , theme: pure $ Vowel Va true
         }
       _ -> Nothing
-  -- 8. T[fut] ⟶ /s+ɨ/ in env. ASP[perf]__
-  , soEnv (matchField _aspect isPerf) $
+  , Tuple "8. T[fut] ⟶ /s+ɨ/ in env. ASP[perf]__" $
+    soEnv (matchField _aspect isPerf) $
     spellfeat _tense \_ -> case _ of
       TFut -> Just $ Just
         { feat: unit
@@ -224,8 +228,8 @@ spellouts =
         , theme: pure $ Vowel V_i false
         }
       _ -> Nothing
-  -- 9. T[fut] ⟶ /∅+ē/ in env. v+TH[+high]__
-  , soEnv (matchField _verb isHigh) $
+  , Tuple "9. T[fut] ⟶ /∅+ē/ in env. v+TH[+high]__" $
+    soEnv (matchField _verb isHigh) $
     spellfeat _tense \_ -> case _ of
       TFut -> Just $ Just
         { feat: unit
@@ -233,8 +237,8 @@ spellouts =
         , theme: pure $ Vowel Ve true
         }
       _ -> Nothing
-  -- 10. T[fut] ⟶ /b+ɨ/ in env. v+TH[-high]__
-  , soEnv (matchField _verb (not isHigh)) $
+  , Tuple "10. T[fut] ⟶ /b+ɨ/ in env. v+TH[-high]__" $
+    soEnv (matchField _verb (not isHigh)) $
     spellfeat _tense \_ -> case _ of
       TFut -> Just $ Just
         { feat: unit
@@ -242,40 +246,40 @@ spellouts =
         , theme: pure $ Vowel V_i false
         }
       _ -> Nothing
-  -- 11. M[subj] ⟶ /s+ē/ in env. T[past]__
-  , soEnv (matchField _tense isPast) $
+  , Tuple "11. M[subj] ⟶ /s+ē/ in env. T[past]__" $
+    soEnv (matchField _tense isPast) $
     spellfeat _mood \_ -> case _ of
       MSubj -> Just $ Just
         { feat: unit
         , head: "s"
         , theme: pure $ Vowel Ve true
         }
-  -- 12. M[subj] ⟶ /s+ī/ in env. ASP[perf]__
-  , soEnv (matchField _aspect isPerf) $
+  , Tuple "12. M[subj] ⟶ /s+ī/ in env. ASP[perf]__" $
+    soEnv (matchField _aspect isPerf) $
     spellfeat _mood \_ -> case _ of
       MSubj -> Just $ Just
         { feat: unit
         , head: "s"
         , theme: pure $ Vowel Vi true
         }
-  -- 13. M[subj] ⟶ /∅+ē/ in env. v+TH[+low]__
-  , soEnv (matchField _verb isLow) $
+  , Tuple "13. M[subj] ⟶ /∅+ē/ in env. v+TH[+low]__" $
+    soEnv (matchField _verb isLow) $
     spellfeat _mood \_ -> case _ of
       MSubj -> Just $ Just
         { feat: unit
         , head: ""
         , theme: pure $ Vowel Ve true
         }
-  -- 14. M[subj] ⟶ /∅+ā/ in env. v+TH[-low]__
-  , soEnv (matchField _verb (not isLow)) $
+  , Tuple "14. M[subj] ⟶ /∅+ā/ in env. v+TH[-low]__" $
+    soEnv (matchField _verb (not isLow)) $
     spellfeat _mood \_ -> case _ of
       MSubj -> Just $ Just
         { feat: unit
         , head: ""
         , theme: pure $ Vowel Va true
         }
-  -- Agreement
-  , \vs -> fromMaybe vs $ vs.agreement <#> \{ feat: Tuple _ agr } ->
+  , Tuple "Agreement endings" $
+    \vs -> fromMaybe vs $ vs.agreement <#> \{ feat: Tuple _ agr } ->
       let
         suffix
           | (vs.aspect <#> _.feat >>> extract) == Just ASPPerf
@@ -341,17 +345,20 @@ onConsonant _ foc = Just foc.focused
 -- Phonetic rules
 
 phRules :: Array PhRule
-phRules =
-  [ centralVowelDeletion
-  , rhotacism
-  , lowering
-  , shortening
-  , shortening2
-  , highVowelFronting
-  , vu
+phRules = phRules' <#> extract
+
+phRules' :: Array (Tuple String PhRule)
+phRules' =
+  [ Tuple "Central-vowel deletion" centralVowelDeletion
+  , Tuple "Rhotacism" rhotacism
+  , Tuple "Shortening" shortening
+  , Tuple "Shortening2" shortening2
+  , Tuple "High-vowel Fronting" highVowelFronting
+  , Tuple "Lowering" lowering
+  , Tuple "v to u" vu
   ]
 
-phRule :: SORule
+phRule :: forall f. VerbStructure f -> VerbStructure f
 phRule = unwrap $ unwrap $ foldMap (Dual <<< Endo <<< runRuleVerbStructure) phRules
 
 -- Delete a central vowel before another vowel
@@ -372,16 +379,6 @@ rhotacism =
     case _ of
       Consonant "s" -> Just (Consonant "r")
       c -> Just c
-
--- Lower unconditionally
-lowering :: PhRule
-lowering = case _ of
-  { after: Just (PhConsonant (Consonant "r"))
-  , focused: PhVowel v
-  } | flip matchVowel v $ Map.fromFoldable
-    [ Tuple Long false, Tuple High true, Tuple Back false ] ->
-      Just (PhVowel (Vowel Ve false))
-  { focused } -> Just focused
 
 shortening :: PhRule
 shortening =
@@ -412,6 +409,14 @@ highVowelFronting =
     if sound == V_i
       then Vowel Vi long
       else Vowel sound long
+
+-- Lower unconditionally
+lowering :: PhRule
+lowering = case _ of
+  { after: Just (PhConsonant (Consonant "r"))
+  , focused: PhVowel (Vowel Vi false)
+  } -> Just (PhVowel (Vowel Ve false))
+  { focused } -> Just focused
 
 vu :: PhRule
 vu =
