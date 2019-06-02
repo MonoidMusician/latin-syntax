@@ -1,7 +1,7 @@
 module Latin.Data where
 
-import Latin.Types
 import Prelude
+import Latin.Types (Agreement(..), Aspect(..), Conjugation(..), Consonant(..), Erased, Focus, Focused, Handled, Mood(..), Numerus(..), Person(..), PhRule, Phoneme(..), SORule, Tense(..), Themed, VerbSpec, VerbStructure, Vowel(..), VowelFeature(..), VowelSound(..), conjugationToTheme, matchVowel, renderVerbStructure, runRuleVerbStructure, vowelOverFeatures, vowelToFeatures)
 
 import Control.Comonad (extract)
 import Control.MonadZero (empty, guard)

@@ -1,12 +1,14 @@
 module Latin.Main where
 
 import Prelude
-import Latin.Types
-import Latin.Data
+import Latin.Types (Agreement(..), Aspect(..), Conjugation(..), Mood(..), Numerus(..), Person(..), Tense(..), VerbSpec, VerbStructure, Vowel, getNumber, getPerson, renderVerbStructure, renderVowel, setNumber, setPerson)
+import Latin.Data (initVS, phRule, run, spellout)
 
 import Partial.Unsafe (unsafePartial)
 import Data.Const (Const)
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), maybe)
+import Data.Foldable (class Foldable, foldMap)
+import Control.Plus (empty, (<|>))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 
@@ -42,7 +44,49 @@ component = H.mkComponent
     render { spec } =
       let
         setSpec f = pure $ SetSpec $ f spec
-        ran = run spec
+        hrenderVS :: forall f. Foldable f => VerbStructure f -> HH.HTML _ _
+        hrenderVS vs =
+          let
+            nullify "" = "∅"
+            nullify s = s
+
+            hrenderThemed ::
+              forall a. Show a =>
+              Maybe { feat :: f a, head :: String, theme :: Array Vowel } ->
+              Array { title :: String, value :: String }
+            hrenderThemed = maybe empty
+              \t ->
+                let
+                  title = nullify (foldMap show t.feat) <> "+TH"
+                  value =
+                    nullify t.head <> "+" <>
+                    nullify (foldMap renderVowel t.theme)
+                in
+                  [ { title: "", value: "‑" } ] <|>
+                  [ { title, value } ]
+
+            cols = [ { title: "√Root", value: vs.root } ]
+              <|> hrenderThemed vs.verb
+              <|> hrenderThemed vs.aspect
+              <|> hrenderThemed vs.tense
+              <|> hrenderThemed vs.mood
+              <|> flip (maybe empty) vs.agreement
+                \t ->
+                  let
+                    title = nullify (foldMap show t.feat)
+                    value = nullify t.suffix
+                  in
+                    [ { title: "", value: "‑" } ] <|>
+                    [ { title, value } ]
+
+            row f =
+              HH.tr_ $ HH.td_ <<< pure <<< HH.text <<< f <$> cols
+          in
+            HH.table_
+              [ HH.thead_ [ HH.text (renderVerbStructure vs) ]
+              , row _.title
+              , row _.value
+              ]
         radio :: forall a. Eq a =>
           String ->
           (VerbSpec -> a) -> (VerbSpec -> a -> VerbSpec) ->
@@ -65,6 +109,9 @@ component = H.mkComponent
           in HH.button
             [ HE.onClick \_ -> Just (SetSpec new) ]
             [ HH.text $ (run new).final ]
+
+        spelled = spellout (initVS (spec))
+        pronounced = phRule (spelled)
       in HH.div_
         [ HH.div_
           [ HH.text "Examples: "
@@ -84,21 +131,21 @@ component = H.mkComponent
           , { name: "III", val: Just CIII, dis: false }
           , { name: "III(i)", val: Just CIIIi, dis: false }
           , { name: "IV", val: Just CIV, dis: false }
-          , { name: "Athematic", val: Nothing, dis: false }
+          , { name: "∅ Athematic", val: Nothing, dis: false }
           ]
         , radio "tense" _.tense _ { tense = _ }
-          [ { name: "null", val: Nothing, dis: true }
-          , { name: "T[pres]", val: Just TPres, dis: false }
-          , { name: "T[past]", val: Just TPast, dis: false }
-          , { name: "T[fut]", val: Just TFut, dis: spec.mood == Just MSubj }
+          [ { name: "∅ Infinitive", val: Nothing, dis: true }
+          , { name: "T[pres] Present", val: Just TPres, dis: false }
+          , { name: "T[past] Past", val: Just TPast, dis: false }
+          , { name: "T[fut] Future", val: Just TFut, dis: spec.mood == Just MSubj }
           ]
         , radio "aspect" _.aspect _ { aspect = _ }
-          [ { name: "null", val: Nothing, dis: false }
-          , { name: "ASP[perf]", val: Just ASPPerf, dis: false }
+          [ { name: "∅ Non-perfect", val: Nothing, dis: false }
+          , { name: "ASP[perf] Perfect", val: Just ASPPerf, dis: false }
           ]
         , radio "mood" _.mood _ { mood = _ }
-          [ { name: "null", val: Nothing, dis: false }
-          , { name: "M[subj]", val: Just MSubj, dis: spec.tense == Just TFut }
+          [ { name: "∅ Indicative", val: Nothing, dis: false }
+          , { name: "M[subj] Subjunctive", val: Just MSubj, dis: spec.tense == Just TFut }
           ]
         , radio "person" (_.agreement >>> map getPerson) (\r p -> r { agreement = flip setPerson <$> p <*> r.agreement })
           [ { name: "1st", val: Just P1, dis: false }
@@ -109,8 +156,10 @@ component = H.mkComponent
           [ { name: "Singular", val: Just Singular, dis: false }
           , { name: "Plural", val: Just Plural, dis: false }
           ]
-        , HH.text ran.spelled
-        , HH.text ran.final
+        , HH.p_ [ HH.text "After spellout of morphemes:" ]
+        , hrenderVS spelled
+        , HH.p_ [ HH.text "After phonological changes:" ]
+        , hrenderVS pronounced
         ]
     eval :: H.HalogenQ (Const Void) Action Unit ~> H.HalogenM State Action () Void Aff
     eval = case _ of

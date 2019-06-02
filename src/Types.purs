@@ -177,12 +177,20 @@ data Tense
 derive instance eqTense :: Eq Tense
 derive instance ordTense :: Ord Tense
 
+instance showTense :: Show Tense where
+  show TPres = "T[pres]"
+  show TPast = "T[past]"
+  show TFut = "T[fut]"
+
 -- Features for ASP
 data Aspect
   = ASPPerf
 
 derive instance eqAspect :: Eq Aspect
 derive instance ordAspect :: Ord Aspect
+
+instance showAspect :: Show Aspect where
+  show ASPPerf = "ASP[perf]"
 
 -- Features for M
 data Mood
@@ -191,20 +199,35 @@ data Mood
 derive instance eqMood :: Eq Mood
 derive instance ordMood :: Ord Mood
 
+instance showMood :: Show Mood where
+  show MSubj = "M[subj]"
+
 data Person = P1 | P2 | P3
 
 derive instance eqPerson :: Eq Person
 derive instance ordPerson :: Ord Person
+
+instance showPerson :: Show Person where
+  show P1 = "1"
+  show P2 = "2"
+  show P3 = "3"
 
 data Numerus = Singular | Plural
 
 derive instance eqNumerus :: Eq Numerus
 derive instance ordNumerus :: Ord Numerus
 
+instance showNumerus :: Show Numerus where
+  show Singular = "S"
+  show Plural = "P"
+
 data Agreement = Agreement Person Numerus
 
 derive instance eqAgreement :: Eq Agreement
 derive instance ordAgreement :: Ord Agreement
+
+instance showAgreement :: Show Agreement where
+  show (Agreement p n) = show p <> show n
 
 getPerson :: Agreement -> Person
 getPerson (Agreement p _) = p
@@ -237,6 +260,13 @@ data Conjugation
 
 derive instance eqConjugation :: Eq Conjugation
 derive instance ordConjugation :: Ord Conjugation
+
+instance showConjugation :: Show Conjugation where
+  show CI = "I"
+  show CII = "II"
+  show CIII = "III"
+  show CIIIi = "III(i)"
+  show CIV = "IV"
 
 conjugationToTheme :: Conjugation -> Vowel
 conjugationToTheme = case _ of
