@@ -81,6 +81,8 @@ isFront :: Conjugation -> Boolean
 isFront = conjugationToTheme >>> vowelToFeatures >>> Set.member Front
 isHigh :: Conjugation -> Boolean
 isHigh = conjugationToTheme >>> vowelToFeatures >>> Set.member High
+isLow :: Conjugation -> Boolean
+isLow = conjugationToTheme >>> vowelToFeatures >>> Set.member Low
 _aspect :: VSField Aspect
 _aspect = { get: _.aspect, set: _ { aspect = _ } }
 isPerf :: Aspect -> Boolean
@@ -153,7 +155,8 @@ spellouts =
             CIIIi -> Vowel Vi false
             CIV -> Vowel Vi true
         }
-  -- 1. ASP[perf] ⟶ /v/ (/u/), /s/, /∅/ + /ɨ/
+  -- 1. ASP[perf] ⟶ /v+ɨ/ (/u+ɨ/), /s+ɨ/, or /∅+ɨ/
+  -- Note: allomorphemes are not modeled.
   , spellfeat _aspect \_ -> case _ of
       ASPPerf -> Just $ Just
         { feat: unit
@@ -166,7 +169,7 @@ spellouts =
       TPres -> Just Nothing
       -- Do nothing
       _ -> Nothing
-  -- 3. T[past] ⟶ /s/+/∅/ in env. ASP[perf]__M[subj]
+  -- 3. T[past] ⟶ /s+∅/ in env. ASP[perf]__M[subj]
   , soEnv (matchField _aspect isPerf) $
     soEnv (matchField _mood   isSubj) $
     spellfeat _tense \_ -> case _ of
@@ -185,7 +188,7 @@ spellouts =
         , theme: empty
         }
       _ -> Nothing
-  -- 5. T[past] ⟶ /s/+/ā/ in env. ASP[perf]__
+  -- 5. T[past] ⟶ /s+ā/ in env. ASP[perf]__
   , soEnv (matchField _aspect isPerf) $
     spellfeat _tense \_ -> case _ of
       TPast -> Just $ Just
@@ -194,7 +197,7 @@ spellouts =
         , theme: pure $ Vowel Va true
         }
       _ -> Nothing
-  -- 6. T[past] ⟶ /ēb/+/ā/ in env. v+TH[+high]__
+  -- 6. T[past] ⟶ /ēb+ā/ in env. v+TH[+high]__
   , soEnv (matchField _verb isHigh) $
     spellfeat _tense \_ -> case _ of
       TPast -> Just $ Just
@@ -203,7 +206,7 @@ spellouts =
         , theme: pure $ Vowel Va true
         }
       _ -> Nothing
-  -- 7. T[past] ⟶ /b/+/ā/ in env. v+TH[-high]__
+  -- 7. T[past] ⟶ /b+ā/ in env. v+TH[-high]__
   , soEnv (matchField _verb (not isHigh)) $
     spellfeat _tense \_ -> case _ of
       TPast -> Just $ Just
@@ -212,7 +215,7 @@ spellouts =
         , theme: pure $ Vowel Va true
         }
       _ -> Nothing
-  -- 8. T[fut] ⟶ /s/+/ɨ/ in env. ASP[perf]__
+  -- 8. T[fut] ⟶ /s+ɨ/ in env. ASP[perf]__
   , soEnv (matchField _aspect isPerf) $
     spellfeat _tense \_ -> case _ of
       TFut -> Just $ Just
@@ -221,7 +224,7 @@ spellouts =
         , theme: pure $ Vowel V_i false
         }
       _ -> Nothing
-  -- 9. T[fut] ⟶ /∅/+/ē/ in env. v+TH[+high]__
+  -- 9. T[fut] ⟶ /∅+ē/ in env. v+TH[+high]__
   , soEnv (matchField _verb isHigh) $
     spellfeat _tense \_ -> case _ of
       TFut -> Just $ Just
@@ -230,7 +233,7 @@ spellouts =
         , theme: pure $ Vowel Ve true
         }
       _ -> Nothing
-  -- 10. T[fut] ⟶ /b/+/ɨ/ in env. v+TH[-high]__
+  -- 10. T[fut] ⟶ /b+ɨ/ in env. v+TH[-high]__
   , soEnv (matchField _verb (not isHigh)) $
     spellfeat _tense \_ -> case _ of
       TFut -> Just $ Just
@@ -239,7 +242,7 @@ spellouts =
         , theme: pure $ Vowel V_i false
         }
       _ -> Nothing
-  -- 11. M[subj] ⟶ /s/ + /ē/ in env. T[past]__
+  -- 11. M[subj] ⟶ /s+ē/ in env. T[past]__
   , soEnv (matchField _tense isPast) $
     spellfeat _mood \_ -> case _ of
       MSubj -> Just $ Just
@@ -247,13 +250,29 @@ spellouts =
         , head: "s"
         , theme: pure $ Vowel Ve true
         }
-  -- 12. M[subj] ⟶ /s/ + /ī/ in env. ASP[perf]__
+  -- 12. M[subj] ⟶ /s+ī/ in env. ASP[perf]__
   , soEnv (matchField _aspect isPerf) $
     spellfeat _mood \_ -> case _ of
       MSubj -> Just $ Just
         { feat: unit
         , head: "s"
         , theme: pure $ Vowel Vi true
+        }
+  -- 13. M[subj] ⟶ /∅+ē/ in env. v+TH[+low]__
+  , soEnv (matchField _verb isLow) $
+    spellfeat _mood \_ -> case _ of
+      MSubj -> Just $ Just
+        { feat: unit
+        , head: ""
+        , theme: pure $ Vowel Ve true
+        }
+  -- 14. M[subj] ⟶ /∅+ā/ in env. v+TH[-low]__
+  , soEnv (matchField _verb (not isLow)) $
+    spellfeat _mood \_ -> case _ of
+      MSubj -> Just $ Just
+        { feat: unit
+        , head: ""
+        , theme: pure $ Vowel Va true
         }
   -- Agreement
   , \vs -> fromMaybe vs $ vs.agreement <#> \{ feat: Tuple _ agr } ->

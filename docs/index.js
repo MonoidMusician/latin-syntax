@@ -38117,8 +38117,8 @@ var soEnv$prime = function (match) {
     return function (rule) {
         return function (vs) {
             return function (a) {
-                var $72 = match(vs);
-                if ($72) {
+                var $76 = match(vs);
+                if ($76) {
                     return rule(vs)(a);
                 };
                 return Data_Maybe.Nothing.value;
@@ -38129,8 +38129,8 @@ var soEnv$prime = function (match) {
 var soEnv = function (match) {
     return function (rule) {
         return function (vs) {
-            var $73 = match(vs);
-            if ($73) {
+            var $77 = match(vs);
+            if ($77) {
                 return rule(vs);
             };
             return vs;
@@ -38146,15 +38146,15 @@ var shortening2 = function (v) {
     };
     return new Data_Maybe.Just(v.focused);
 };
-var prevocalic = function ($167) {
+var prevocalic = function ($173) {
     return Data_Foldable.any(Data_Foldable.foldableMaybe)(Data_HeytingAlgebra.heytingAlgebraBoolean)(vocalic)((function (v) {
         return v.after;
-    })($167));
+    })($173));
 };
-var postvocalic = function ($168) {
+var postvocalic = function ($174) {
     return Data_Foldable.any(Data_Foldable.foldableMaybe)(Data_HeytingAlgebra.heytingAlgebraBoolean)(vocalic)((function (v) {
         return v.before;
-    })($168));
+    })($174));
 };
 var onVowel = function (v) {
     return function (v1) {
@@ -38214,8 +38214,11 @@ var isPast = function (v) {
     };
     return false;
 };
-var isHigh = function ($169) {
-    return Data_Set.member(Latin_Types.ordVowelFeature)(Latin_Types.High.value)(Latin_Types.vowelToFeatures(Latin_Types.conjugationToTheme($169)));
+var isLow = function ($175) {
+    return Data_Set.member(Latin_Types.ordVowelFeature)(Latin_Types.Low.value)(Latin_Types.vowelToFeatures(Latin_Types.conjugationToTheme($175)));
+};
+var isHigh = function ($176) {
+    return Data_Set.member(Latin_Types.ordVowelFeature)(Latin_Types.High.value)(Latin_Types.vowelToFeatures(Latin_Types.conjugationToTheme($176)));
 };
 var isFut = function (v) {
     if (v instanceof Latin_Types.TFut) {
@@ -38223,19 +38226,19 @@ var isFut = function (v) {
     };
     return false;
 };
-var isFront = function ($170) {
-    return Data_Set.member(Latin_Types.ordVowelFeature)(Latin_Types.Front.value)(Latin_Types.vowelToFeatures(Latin_Types.conjugationToTheme($170)));
+var isFront = function ($177) {
+    return Data_Set.member(Latin_Types.ordVowelFeature)(Latin_Types.Front.value)(Latin_Types.vowelToFeatures(Latin_Types.conjugationToTheme($177)));
 };
 var intervocalic = Data_HeytingAlgebra.conj(Data_HeytingAlgebra.heytingAlgebraFunction(Data_HeytingAlgebra.heytingAlgebraBoolean))(prevocalic)(postvocalic);
 var initVS = function (vs) {
-    var emptyThemed = function ($171) {
+    var emptyThemed = function ($178) {
         return Data_Maybe.Just.create((function (v) {
             return {
                 feat: v,
                 head: "",
                 theme: Control_Plus.empty(Control_Plus.plusArray)
             };
-        })(Data_Tuple.Tuple.create(false)($171)));
+        })(Data_Tuple.Tuple.create(false)($178)));
     };
     return {
         root: vs.root,
@@ -38243,13 +38246,13 @@ var initVS = function (vs) {
         aspect: Control_Bind.bind(Data_Maybe.bindMaybe)(vs.aspect)(emptyThemed),
         tense: Control_Bind.bind(Data_Maybe.bindMaybe)(vs.tense)(emptyThemed),
         mood: Control_Bind.bind(Data_Maybe.bindMaybe)(vs.mood)(emptyThemed),
-        agreement: Control_Bind.bind(Data_Maybe.bindMaybe)(vs.agreement)(function ($172) {
+        agreement: Control_Bind.bind(Data_Maybe.bindMaybe)(vs.agreement)(function ($179) {
             return Data_Maybe.Just.create((function (v) {
                 return {
                     feat: v,
                     suffix: ""
                 };
-            })(Data_Tuple.Tuple.create(false)($172)));
+            })(Data_Tuple.Tuple.create(false)($179)));
         })
     };
 };
@@ -38269,8 +38272,8 @@ var rhotacism = inEnv(intervocalic)(onConsonant(function (v) {
     };
     return new Data_Maybe.Just(v);
 }));
-var shortening = inEnv(prevocalic)(onVowel(function ($173) {
-    return Data_Maybe.Just.create(Latin_Types.vowelOverFeatures(Data_Set["delete"](Latin_Types.ordVowelFeature)(Latin_Types.Long.value))($173));
+var shortening = inEnv(prevocalic)(onVowel(function ($180) {
+    return Data_Maybe.Just.create(Latin_Types.vowelOverFeatures(Data_Set["delete"](Latin_Types.ordVowelFeature)(Latin_Types.Long.value))($180));
 }));
 var vu = inEnv(Data_HeytingAlgebra.not(Data_HeytingAlgebra.heytingAlgebraFunction(Data_HeytingAlgebra.heytingAlgebraBoolean))(postvocalic))(function (v) {
     if (v.focused instanceof Latin_Types.PhConsonant && v.focused.value0 === "v") {
@@ -38293,8 +38296,8 @@ var vu = inEnv(Data_HeytingAlgebra.not(Data_HeytingAlgebra.heytingAlgebraFunctio
  */
 var highVowelFronting = onVowel(function (v) {
     return new Data_Maybe.Just((function () {
-        var $112 = Data_Eq.eq(Latin_Types.eqVowelSound)(v.value0)(Latin_Types.V_i.value);
-        if ($112) {
+        var $116 = Data_Eq.eq(Latin_Types.eqVowelSound)(v.value0)(Latin_Types.V_i.value);
+        if ($116) {
             return new Latin_Types.Vowel(Latin_Types.Vi.value, v.value1);
         };
         return new Latin_Types.Vowel(v.value0, v.value1);
@@ -38327,28 +38330,28 @@ var spellfeat = function (field) {
     };
 };
 var getField = function (field) {
-    return function ($174) {
-        return Data_Functor.map(Data_Maybe.functorMaybe)(Control_Comonad.extract(Data_Tuple.comonadTuple))(getField$prime(field)($174));
+    return function ($181) {
+        return Data_Functor.map(Data_Maybe.functorMaybe)(Control_Comonad.extract(Data_Tuple.comonadTuple))(getField$prime(field)($181));
     };
 };
 var matchField = function (field) {
     return function (pred) {
-        return function ($175) {
-            return Data_Foldable.any(Data_Foldable.foldableMaybe)(Data_HeytingAlgebra.heytingAlgebraBoolean)(pred)(getField(field)($175));
+        return function ($182) {
+            return Data_Foldable.any(Data_Foldable.foldableMaybe)(Data_HeytingAlgebra.heytingAlgebraBoolean)(pred)(getField(field)($182));
         };
     };
 };
 var noField = function (field) {
-    return function ($176) {
-        return Data_Maybe.isNothing(getField(field)($176));
+    return function ($183) {
+        return Data_Maybe.isNothing(getField(field)($183));
     };
 };
 
 // Delete a central vowel before another vowel
 var centralVowelDeletion = inEnv(prevocalic)(onVowel(function (v) {
     var target = Data_Map_Internal.fromFoldable(Latin_Types.ordVowelFeature)(Data_Foldable.foldableArray)([ new Data_Tuple.Tuple(Latin_Types.Back.value, false), new Data_Tuple.Tuple(Latin_Types.Front.value, false) ]);
-    var $119 = Latin_Types.matchVowel(target)(v);
-    if ($119) {
+    var $123 = Latin_Types.matchVowel(target)(v);
+    if ($123) {
         return Data_Maybe.Nothing.value;
     };
     return new Data_Maybe.Just(v);
@@ -38356,8 +38359,8 @@ var centralVowelDeletion = inEnv(prevocalic)(onVowel(function (v) {
 
 // Phonetic rules
 var phRules = [ centralVowelDeletion, rhotacism, lowering, shortening, shortening2, highVowelFronting, vu ];
-var phRule = Data_Newtype.unwrap(Data_Newtype.newtypeEndo)(Data_Newtype.unwrap(Data_Newtype.newtypeDual)(Data_Foldable.foldMap(Data_Foldable.foldableArray)(Data_Monoid_Dual.monoidDual(Data_Monoid_Endo.monoidEndo(Control_Category.categoryFn)))(function ($177) {
-    return Data_Monoid_Dual.Dual(Data_Monoid_Endo.Endo(Latin_Types.runRuleVerbStructure($177)));
+var phRule = Data_Newtype.unwrap(Data_Newtype.newtypeEndo)(Data_Newtype.unwrap(Data_Newtype.newtypeDual)(Data_Foldable.foldMap(Data_Foldable.foldableArray)(Data_Monoid_Dual.monoidDual(Data_Monoid_Endo.monoidEndo(Control_Category.categoryFn)))(function ($184) {
+    return Data_Monoid_Dual.Dual(Data_Monoid_Endo.Endo(Latin_Types.runRuleVerbStructure($184)));
 })(phRules)));
 var _verb = {
     get: function (v) {
@@ -38448,7 +38451,7 @@ var spellouts = [ spellfeat(_verb)(function (v) {
                 if (conj instanceof Latin_Types.CIV) {
                     return new Latin_Types.Vowel(Latin_Types.Vi.value, true);
                 };
-                throw new Error("Failed pattern match at Latin.Data (line 149, column 25 - line 154, column 33): " + [ conj.constructor.name ]);
+                throw new Error("Failed pattern match at Latin.Data (line 151, column 25 - line 156, column 33): " + [ conj.constructor.name ]);
             })())
         }));
     };
@@ -38571,12 +38574,28 @@ var spellouts = [ spellfeat(_verb)(function (v) {
             theme: Control_Applicative.pure(Control_Applicative.applicativeArray)(new Latin_Types.Vowel(Latin_Types.Vi.value, true))
         }));
     };
+})), soEnv(matchField(_verb)(isLow))(spellfeat(_mood)(function (v) {
+    return function (v1) {
+        return Data_Maybe.Just.create(new Data_Maybe.Just({
+            feat: Data_Unit.unit,
+            head: "",
+            theme: Control_Applicative.pure(Control_Applicative.applicativeArray)(new Latin_Types.Vowel(Latin_Types.Ve.value, true))
+        }));
+    };
+})), soEnv(matchField(_verb)(Data_HeytingAlgebra.not(Data_HeytingAlgebra.heytingAlgebraFunction(Data_HeytingAlgebra.heytingAlgebraBoolean))(isLow)))(spellfeat(_mood)(function (v) {
+    return function (v1) {
+        return Data_Maybe.Just.create(new Data_Maybe.Just({
+            feat: Data_Unit.unit,
+            head: "",
+            theme: Control_Applicative.pure(Control_Applicative.applicativeArray)(new Latin_Types.Vowel(Latin_Types.Va.value, true))
+        }));
+    };
 })), function (vs) {
     return Data_Maybe.fromMaybe(vs)(Data_Functor.mapFlipped(Data_Maybe.functorMaybe)(vs.agreement)(function (v) {
         var suffix = (function () {
             var v1 = function (v2) {
                 if (v.feat.value1.value0 instanceof Latin_Types.P1 && v.feat.value1.value1 instanceof Latin_Types.Singular) {
-                    var $135 = Data_Eq.eq(Data_Maybe.eqMaybe(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+                    var $141 = Data_Eq.eq(Data_Maybe.eqMaybe(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
                         return "theme";
                     }))(Data_Eq.eqArray(Latin_Types.eqVowel)))()(new Data_Symbol.IsSymbol(function () {
                         return "head";
@@ -38594,12 +38613,12 @@ var spellouts = [ spellfeat(_verb)(function (v) {
                         return "head";
                     }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
                         return "feat";
-                    }))(Data_Tuple.eqTuple(Data_Eq.eqBoolean)(Latin_Types.eqMood)))))(vs.mood)(Data_Maybe.Nothing.value)) || Data_Eq.eq(Data_Maybe.eqMaybe(Latin_Types.eqTense))(Data_Functor.mapFlipped(Data_Maybe.functorMaybe)(vs.tense)(function ($178) {
+                    }))(Data_Tuple.eqTuple(Data_Eq.eqBoolean)(Latin_Types.eqMood)))))(vs.mood)(Data_Maybe.Nothing.value)) || Data_Eq.eq(Data_Maybe.eqMaybe(Latin_Types.eqTense))(Data_Functor.mapFlipped(Data_Maybe.functorMaybe)(vs.tense)(function ($185) {
                         return Control_Comonad.extract(Data_Tuple.comonadTuple)((function (v3) {
                             return v3.feat;
-                        })($178));
+                        })($185));
                     }))(new Data_Maybe.Just(Latin_Types.TFut.value));
-                    if ($135) {
+                    if ($141) {
                         return "\u014d";
                     };
                     return "\u02d8m";
@@ -38619,30 +38638,30 @@ var spellouts = [ spellfeat(_verb)(function (v) {
                 if (v.feat.value1.value0 instanceof Latin_Types.P3 && v.feat.value1.value1 instanceof Latin_Types.Plural) {
                     return "\u02d8nt";
                 };
-                throw new Error("Failed pattern match at Latin.Data (line 272, column 18 - line 285, column 7): " + [ v.feat.value1.constructor.name ]);
+                throw new Error("Failed pattern match at Latin.Data (line 291, column 18 - line 304, column 7): " + [ v.feat.value1.constructor.name ]);
             };
-            var $148 = Data_Eq.eq(Data_Maybe.eqMaybe(Latin_Types.eqAspect))(Data_Functor.mapFlipped(Data_Maybe.functorMaybe)(vs.aspect)(function ($179) {
+            var $154 = Data_Eq.eq(Data_Maybe.eqMaybe(Latin_Types.eqAspect))(Data_Functor.mapFlipped(Data_Maybe.functorMaybe)(vs.aspect)(function ($186) {
                 return Control_Comonad.extract(Data_Tuple.comonadTuple)((function (v2) {
                     return v2.feat;
-                })($179));
+                })($186));
             }))(new Data_Maybe.Just(Latin_Types.ASPPerf.value));
-            if ($148) {
-                var $149 = Data_Eq.eq(Data_Maybe.eqMaybe(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+            if ($154) {
+                var $155 = Data_Eq.eq(Data_Maybe.eqMaybe(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
                     return "theme";
                 }))(Data_Eq.eqArray(Latin_Types.eqVowel)))()(new Data_Symbol.IsSymbol(function () {
                     return "head";
                 }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
                     return "feat";
                 }))(Data_Tuple.eqTuple(Data_Eq.eqBoolean)(Latin_Types.eqTense)))))(vs.tense)(Data_Maybe.Nothing.value);
-                if ($149) {
-                    var $150 = Data_Eq.eq(Data_Maybe.eqMaybe(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
+                if ($155) {
+                    var $156 = Data_Eq.eq(Data_Maybe.eqMaybe(Data_Eq.eqRec()(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowCons(Data_Eq.eqRowNil)()(new Data_Symbol.IsSymbol(function () {
                         return "theme";
                     }))(Data_Eq.eqArray(Latin_Types.eqVowel)))()(new Data_Symbol.IsSymbol(function () {
                         return "head";
                     }))(Data_Eq.eqString))()(new Data_Symbol.IsSymbol(function () {
                         return "feat";
                     }))(Data_Tuple.eqTuple(Data_Eq.eqBoolean)(Latin_Types.eqMood)))))(vs.mood)(Data_Maybe.Nothing.value);
-                    if ($150) {
+                    if ($156) {
                         if (v.feat.value1.value0 instanceof Latin_Types.P1 && v.feat.value1.value1 instanceof Latin_Types.Singular) {
                             return "\u012b";
                         };
@@ -38661,7 +38680,7 @@ var spellouts = [ spellfeat(_verb)(function (v) {
                         if (v.feat.value1.value0 instanceof Latin_Types.P3 && v.feat.value1.value1 instanceof Latin_Types.Plural) {
                             return "\u0113runt";
                         };
-                        throw new Error("Failed pattern match at Latin.Data (line 265, column 13 - line 272, column 9): " + [ v.feat.value1.constructor.name ]);
+                        throw new Error("Failed pattern match at Latin.Data (line 284, column 13 - line 291, column 9): " + [ v.feat.value1.constructor.name ]);
                     };
                     return v1(true);
                 };
@@ -38682,8 +38701,8 @@ var spellouts = [ spellfeat(_verb)(function (v) {
         };
     }));
 } ];
-var spellout = Data_Newtype.unwrap(Data_Newtype.newtypeEndo)(Data_Newtype.unwrap(Data_Newtype.newtypeDual)(Data_Foldable.foldMap(Data_Foldable.foldableArray)(Data_Monoid_Dual.monoidDual(Data_Monoid_Endo.monoidEndo(Control_Category.categoryFn)))(function ($180) {
-    return Data_Monoid_Dual.Dual(Data_Monoid_Endo.Endo($180));
+var spellout = Data_Newtype.unwrap(Data_Newtype.newtypeEndo)(Data_Newtype.unwrap(Data_Newtype.newtypeDual)(Data_Foldable.foldMap(Data_Foldable.foldableArray)(Data_Monoid_Dual.monoidDual(Data_Monoid_Endo.monoidEndo(Control_Category.categoryFn)))(function ($187) {
+    return Data_Monoid_Dual.Dual(Data_Monoid_Endo.Endo($187));
 })(spellouts)));
 var run = Control_Apply.apply(Control_Apply.applyFn)(Data_Functor.map(Data_Functor.functorFn)(function (v) {
     return function (v1) {
@@ -38692,12 +38711,12 @@ var run = Control_Apply.apply(Control_Apply.applyFn)(Data_Functor.map(Data_Funct
             "final": v1
         };
     };
-})(function ($181) {
-    return Latin_Types.renderVerbStructure(spellout(initVS($181)));
-}))(function ($182) {
-    return (function ($183) {
-        return Latin_Types.renderVerbStructure(phRule($183));
-    })(spellout(initVS($182)));
+})(function ($188) {
+    return Latin_Types.renderVerbStructure(spellout(initVS($188)));
+}))(function ($189) {
+    return (function ($190) {
+        return Latin_Types.renderVerbStructure(phRule($190));
+    })(spellout(initVS($189)));
 });
 module.exports = {
     initVS: initVS,
@@ -38707,6 +38726,7 @@ module.exports = {
     "_verb": _verb,
     isFront: isFront,
     isHigh: isHigh,
+    isLow: isLow,
     "_aspect": _aspect,
     isPerf: isPerf,
     "_tense": _tense,
