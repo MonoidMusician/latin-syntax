@@ -144,15 +144,15 @@ component = H.mkComponent
           , { name: "IV", val: Just CIV, dis: false }
           , { name: "∅ Athematic", val: Nothing, dis: false }
           ]
+        , radio "aspect" _.aspect _ { aspect = _ }
+          [ { name: "∅ Non-perfect", val: Nothing, dis: false }
+          , { name: "ASP[perf] Perfect", val: Just ASPPerf, dis: false }
+          ]
         , radio "tense" _.tense _ { tense = _ }
           [ { name: "∅ Infinitive", val: Nothing, dis: true }
           , { name: "T[pres] Present", val: Just TPres, dis: false }
           , { name: "T[past] Past", val: Just TPast, dis: false }
           , { name: "T[fut] Future", val: Just TFut, dis: spec.mood == Just MSubj }
-          ]
-        , radio "aspect" _.aspect _ { aspect = _ }
-          [ { name: "∅ Non-perfect", val: Nothing, dis: false }
-          , { name: "ASP[perf] Perfect", val: Just ASPPerf, dis: false }
           ]
         , radio "mood" _.mood _ { mood = _ }
           [ { name: "∅ Indicative", val: Nothing, dis: false }

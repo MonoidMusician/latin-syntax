@@ -304,7 +304,15 @@ spellouts' =
           Agreement P3 Singular -> "˘t"
           Agreement P1 Plural   -> "mus"
           Agreement P2 Plural   -> "tis"
-          Agreement P3 Plural   -> "˘nt"
+          Agreement P3 Plural   ->
+            if (vs.aspect == Nothing &&
+                vs.tense == Nothing &&
+                vs.mood == Nothing)
+              then
+                case vs.verb <#> _.feat >>> extract of
+                  Just v | v == CIII || v == CIIIi || v == CIV -> "unt"
+                  _ -> "˘nt"
+              else "˘nt"
       in vs { agreement = Just { feat: Tuple true agr, suffix }}
   ]
 
